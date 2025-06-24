@@ -1,0 +1,308 @@
+/* Light background + animated effect (как на home) */
+.walletPage {
+	position: relative;
+	min-height: 100vh;
+	background: #fff;
+	color: #23234a;
+	overflow-x: hidden;
+}
+.animatedBg {
+	position: absolute;
+	inset: 0;
+	z-index: 0;
+	pointer-events: none;
+	background: linear-gradient(120deg, #007aff 0%, #6f7cff 60%, #a259ff 100%);
+	opacity: 0.13;
+	animation: heroGradient 8s ease-in-out infinite alternate;
+}
+@keyframes heroGradient {
+	0% {
+		filter: blur(0.5rem) brightness(1);
+	}
+	100% {
+		filter: blur(1.5rem) brightness(1.1);
+	}
+}
+
+.heroSection {
+	position: relative;
+	z-index: 1;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	padding: 2.2rem 1.2rem 1.1rem 1.2rem;
+}
+.connectBtn {
+	background: linear-gradient(90deg, #007aff 0%, #a259ff 100%);
+	color: #fff;
+	font-weight: 700;
+	font-size: 1.13rem;
+	padding: 1rem 2.5rem;
+	border-radius: 2rem;
+	border: none;
+	box-shadow: 0 2px 16px 0 #a259ff22;
+	margin-bottom: 1.2rem;
+	cursor: pointer;
+	transition: background 0.18s, transform 0.18s;
+	display: flex;
+	align-items: center;
+	gap: 0.7rem;
+}
+.connectBtn:active {
+	transform: scale(0.97);
+	background: linear-gradient(90deg, #0051a8 0%, #7a3cff 100%);
+}
+.connectHint {
+	color: #5a5a7a;
+	font-size: 1.01rem;
+	text-align: center;
+	margin-bottom: 0.7rem;
+}
+.walletInfo {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	margin-bottom: 0.7rem;
+}
+.walletLabel {
+	font-size: 0.97rem;
+	color: #5a5a7a;
+	margin-bottom: 0.1rem;
+}
+.walletAddress {
+	font-size: 1.13rem;
+	font-weight: 600;
+	letter-spacing: 0.04em;
+	color: #23234a;
+	background: #f3f6ff;
+	padding: 0.32rem 1.1rem;
+	border-radius: 1.1rem;
+}
+.balanceBlock {
+	display: flex;
+	align-items: center;
+	gap: 0.7rem;
+	margin-bottom: 0.7rem;
+}
+.tonLogo {
+	display: inline-block;
+	vertical-align: middle;
+}
+.balance {
+	font-size: 1.25rem;
+	font-weight: 700;
+	color: #007aff;
+}
+
+.activitySection {
+	position: relative;
+	z-index: 1;
+	margin: 0 auto;
+	max-width: 420px;
+	padding: 0.5rem 0.5rem 7.5rem 0.5rem;
+}
+.activityBadge {
+	display: inline-flex;
+	align-items: center;
+	gap: 0.5rem;
+	background: linear-gradient(90deg, #f3f6ff 0%, #f8f0ff 100%);
+	color: #7a5cff;
+	font-size: 0.97rem;
+	font-weight: 600;
+	border-radius: 1.1rem;
+	padding: 0.32rem 1.1rem;
+	margin-bottom: 1.1rem;
+}
+.txList {
+	max-height: 320px;
+	overflow-y: auto;
+	display: flex;
+	flex-direction: column;
+	gap: 1.1rem;
+	padding-bottom: 0.5rem;
+}
+.txCard {
+	display: flex;
+	flex-direction: column;
+	background: linear-gradient(90deg, #f3f6ff 0%, #f8f0ff 100%);
+	border-radius: 1.1rem;
+	padding: 1.1rem 1.1rem 0.7rem 1.1rem;
+	box-shadow: 0 2px 12px 0 #a259ff11;
+	gap: 0.3rem;
+	position: relative;
+}
+.txIcon {
+	position: absolute;
+	top: 1.1rem;
+	left: 1.1rem;
+}
+.txAmount {
+	margin-left: 2.2rem;
+	font-size: 1.09rem;
+	font-weight: 700;
+	color: #007aff;
+}
+.txAmount:before {
+	content: '';
+}
+.txTitle {
+	margin-left: 2.2rem;
+	font-size: 0.99rem;
+	color: #5a5a7a;
+	margin-bottom: 0.1rem;
+}
+.txStatus {
+	margin-left: 2.2rem;
+	font-size: 0.93rem;
+	font-weight: 500;
+	margin-bottom: 0.1rem;
+}
+.txStatus[data-status='success'] {
+	color: #00b37a;
+}
+.txStatus[data-status='pending'] {
+	color: #a259ff;
+}
+.txStatus[data-status='failed'] {
+	color: #ff4b4b;
+}
+.txPendingSpin {
+	vertical-align: middle;
+	margin-right: 0.2em;
+	animation: spin 1.2s linear infinite;
+}
+@keyframes spin {
+	100% {
+		transform: rotate(360deg);
+	}
+}
+.txTime {
+	margin-left: 2.2rem;
+	font-size: 0.91rem;
+	color: #a3a3c2;
+}
+.txPlaceholder {
+	color: #5a5a7a;
+	font-size: 1.01rem;
+	text-align: center;
+	margin-top: 2.5rem;
+}
+
+@media (max-width: 600px) {
+	.heroSection {
+		padding: 1.3rem 0.3rem 0.7rem 0.3rem;
+	}
+	.activitySection {
+		padding: 0.2rem 0.1rem 8.5rem 0.1rem;
+	}
+	.txCard {
+		padding: 0.8rem 0.7rem 0.5rem 0.7rem;
+	}
+	.txAmount,
+	.txTitle,
+	.txStatus,
+	.txTime {
+		margin-left: 2rem;
+	}
+}
+
+.modalOverlay {
+	position: fixed;
+	inset: 0;
+	background: rgba(30, 30, 60, 0.18);
+	z-index: 2000;
+	display: flex;
+	align-items: flex-end;
+	justify-content: center;
+	animation: modalFadeIn 0.2s;
+}
+@keyframes modalFadeIn {
+	from {
+		opacity: 0;
+	}
+	to {
+		opacity: 1;
+	}
+}
+.modalSheet {
+	background: #fff;
+	border-radius: 1.5rem 1.5rem 0 0;
+	box-shadow: 0 -2px 24px 0 #a259ff22;
+	padding: 1.5rem 1.2rem 2.2rem 1.2rem;
+	width: 100%;
+	max-width: 420px;
+	margin-bottom: 0;
+	position: relative;
+	animation: sheetUp 0.22s cubic-bezier(0.4, 1.3, 0.6, 1) both;
+}
+@keyframes sheetUp {
+	from {
+		transform: translateY(100%);
+	}
+	to {
+		transform: translateY(0);
+	}
+}
+.modalHandle {
+	width: 44px;
+	height: 5px;
+	background: #e0e7ff;
+	border-radius: 3px;
+	margin: 0 auto 1.1rem auto;
+}
+.modalTitle {
+	font-size: 1.13rem;
+	font-weight: 700;
+	color: #23234a;
+	text-align: center;
+	margin-bottom: 1.2rem;
+}
+.disconnectBtn {
+	width: 100%;
+	background: linear-gradient(90deg, #ff4b4b 0%, #a259ff 100%);
+	color: #fff;
+	font-weight: 700;
+	font-size: 1.07rem;
+	padding: 0.95rem 0;
+	border-radius: 1.1rem;
+	border: none;
+	margin-bottom: 0.7rem;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	gap: 0.7rem;
+	box-shadow: 0 2px 12px 0 #a259ff11;
+	cursor: pointer;
+	transition: background 0.18s, transform 0.18s;
+}
+.disconnectBtn:active {
+	transform: scale(0.97);
+	background: linear-gradient(90deg, #d90000 0%, #7a3cff 100%);
+}
+.cancelBtn {
+	width: 100%;
+	background: #f3f6ff;
+	color: #7a5cff;
+	font-weight: 600;
+	font-size: 1.07rem;
+	padding: 0.95rem 0;
+	border-radius: 1.1rem;
+	border: none;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	gap: 0.7rem;
+	cursor: pointer;
+	transition: background 0.18s, color 0.18s;
+}
+.cancelBtn:active {
+	background: #e0e7ff;
+	color: #23234a;
+}
+
+@media (max-width: 600px) {
+	.modalSheet {
+		padding: 1.1rem 0.5rem 1.7rem 0.5rem;
+		max-width: 100vw;
+	}
+}
