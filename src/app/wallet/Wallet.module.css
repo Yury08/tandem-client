@@ -225,15 +225,22 @@
 	}
 }
 .modalSheet {
-	background: #fff;
+	background: linear-gradient(120deg, #f3f6ff 0%, #f8f0ff 100%);
 	border-radius: 1.5rem 1.5rem 0 0;
-	box-shadow: 0 -2px 24px 0 #a259ff22;
+	box-shadow: 0 -4px 32px 0 #a259ff33, 0 0 0 2px #e0e7ff;
 	padding: 1.5rem 1.2rem 2.2rem 1.2rem;
 	width: 100%;
 	max-width: 420px;
 	margin-bottom: 0;
 	position: relative;
 	animation: sheetUp 0.22s cubic-bezier(0.4, 1.3, 0.6, 1) both;
+	max-height: 380px;
+	display: flex;
+	flex-direction: column;
+	align-items: stretch;
+	border: 1.5px solid #e0e7ff;
+	border-bottom: none;
+	box-sizing: border-box;
 }
 @keyframes sheetUp {
 	from {
@@ -246,9 +253,10 @@
 .modalHandle {
 	width: 44px;
 	height: 5px;
-	background: #e0e7ff;
+	background: linear-gradient(90deg, #a259ff 0%, #007aff 100%);
 	border-radius: 3px;
 	margin: 0 auto 1.1rem auto;
+	box-shadow: 0 2px 8px 0 #a259ff22;
 }
 .modalTitle {
 	font-size: 1.13rem;
@@ -304,5 +312,69 @@
 	.modalSheet {
 		padding: 1.1rem 0.5rem 1.7rem 0.5rem;
 		max-width: 100vw;
+		max-height: 320px;
 	}
+	.walletsList {
+		max-height: 110px;
+	}
+}
+
+.walletsList {
+	display: flex;
+	flex-direction: column;
+	gap: 0.7rem;
+	margin-bottom: 1.1rem;
+	overflow-y: auto;
+	max-height: 180px;
+	padding-right: 2px;
+	scrollbar-width: thin;
+}
+.walletsList::-webkit-scrollbar {
+	width: 6px;
+	background: transparent;
+}
+.walletsList::-webkit-scrollbar-thumb {
+	background: #e0e7ff;
+	border-radius: 6px;
+}
+.walletItem {
+	display: flex;
+	align-items: center;
+	gap: 0.8rem;
+	background: #f3f6ff;
+	border-radius: 1.1rem;
+	padding: 0.7rem 1rem;
+	border: none;
+	cursor: pointer;
+	transition: background 0.16s, box-shadow 0.16s;
+	box-shadow: 0 1px 6px 0 #a259ff11;
+	font-size: 1.07rem;
+	font-weight: 500;
+	color: #23234a;
+}
+.walletItem:hover {
+	background: linear-gradient(90deg, #e0e7ff 0%, #f8f0ff 100%);
+	box-shadow: 0 2px 12px 0 #a259ff22;
+}
+.walletItemIcon {
+	width: 2.1rem;
+	height: 2.1rem;
+	border-radius: 0.7rem;
+	background: #fff;
+	object-fit: contain;
+	box-shadow: 0 1px 6px 0 #a259ff11;
+}
+.walletItemName {
+	flex: 1 1 auto;
+	font-weight: 600;
+	font-size: 1.07rem;
+	color: #23234a;
+}
+.walletItemAddr {
+	font-size: 0.97rem;
+	color: #7a5cff;
+	font-family: monospace;
+	background: #f8f0ff;
+	padding: 0.18rem 0.7rem;
+	border-radius: 0.7rem;
 }

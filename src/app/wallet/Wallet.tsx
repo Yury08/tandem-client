@@ -1,4 +1,12 @@
 'use client'
+import TonConnect from '@tonconnect/sdk'
+
+import {
+	isWalletInfoCurrentlyEmbedded,
+	isWalletInfoCurrentlyInjected,
+	WalletInfoCurrentlyEmbedded,
+	WalletInfoCurrentlyInjected,
+} from '@tonconnect/sdk'
 import {
 	ArrowDownLeft,
 	ArrowUpRight,
@@ -6,16 +14,18 @@ import {
 	Loader2,
 	LogOut,
 	Sparkles,
-	Wallet as WalletIcon,
+	WalletIcon,
 	XCircle,
 } from 'lucide-react'
 import Image from 'next/image'
-import { useState } from 'react'
+import QRCode from 'qrcode'
+import { useEffect, useState } from 'react'
 import ton_logo from '../../../public/ton-logo.png'
+import { TonConnectLocalStorage } from '../../services/wallet.service'
 import styles from './Wallet.module.css'
-
 const mockAddress = 'EQB3...abc'
 const mockBalance = 123.456
+
 const mockTxs = [
 	{
 		type: 'in',
@@ -47,14 +57,116 @@ const mockTxs = [
 	},
 ]
 
+const manifestUrl = 'https://yury08.github.io/tandem-metadata/manifest.json'
+const storage = new TonConnectLocalStorage()
+
+const connector = new TonConnect({
+	manifestUrl,
+	storage,
+})
+
 export default function Wallet() {
 	const [connected, setConnected] = useState(false)
 	const [showModal, setShowModal] = useState(false)
+	const [embeddedWallet, setEmbeddedWallet] =
+		useState<WalletInfoCurrentlyEmbedded>()
+	const [injectedWallet, setInjectedWallet] =
+		useState<WalletInfoCurrentlyInjected>()
 
-	const handleDisconnect = () => {
+	const [showWalletsModal, setShowWalletsModal] = useState(false)
+	const [wallets, setWallets] = useState<any[]>([])
+	const [loadingWallets, setLoadingWallets] = useState(false)
+	const [showQRModal, setShowQRModal] = useState(false)
+	const [qrUrl, setQrUrl] = useState<string | null>(null)
+	const [pendingAddress, setPendingAddress] = useState<string | undefined>()
+	const [showConnectTypeModal, setShowConnectTypeModal] = useState(false)
+	const [connectionLink, setConnectionLink] = useState<string | null>(null)
+	const [balance, setBalance] = useState<number | null>(null)
+
+	const handleDisconnect = async () => {
+		await connector.disconnect()
 		setConnected(false)
 		setShowModal(false)
+		setPendingAddress(undefined)
+		setBalance(null)
 	}
+
+	const handleConnectClick = async () => {
+		setLoadingWallets(true)
+		try {
+			const walletsList = await connector.getWallets()
+			const embeddedWallet = walletsList.find(isWalletInfoCurrentlyEmbedded)
+			const injectedWallet = walletsList.find(isWalletInfoCurrentlyInjected)
+			setWallets(walletsList)
+			setEmbeddedWallet(embeddedWallet)
+			setInjectedWallet(injectedWallet)
+		} catch (e) {
+			setWallets([])
+		} finally {
+			setLoadingWallets(false)
+			setShowWalletsModal(true)
+		}
+	}
+
+	const handleWalletSelect = async (wallet: any) => {
+		if (embeddedWallet) {
+			await connector.connect({ jsBridgeKey: embeddedWallet.jsBridgeKey })
+			setShowWalletsModal(false)
+		} else if (injectedWallet) {
+			await connector.connect({ jsBridgeKey: injectedWallet.jsBridgeKey })
+			setShowWalletsModal(false)
+		} else if (wallet && wallet.universalLink && wallet.bridgeUrl) {
+			const link = connector.connect({
+				universalLink: wallet.universalLink,
+				bridgeUrl: wallet.bridgeUrl,
+			})
+			setConnectionLink(link)
+			setShowWalletsModal(false)
+			setShowConnectTypeModal(true)
+		}
+	}
+
+	const handleConnectType = (type: 'qr' | 'link') => {
+		if (type === 'qr' && connectionLink) {
+			QRCode.toDataURL(connectionLink).then((url: string) => {
+				setQrUrl(url)
+				setShowConnectTypeModal(false)
+				setShowQRModal(true)
+			})
+		} else if (type === 'link' && connectionLink) {
+			window.open(connectionLink, '_blank')
+			setShowConnectTypeModal(false)
+			setShowWalletsModal(false)
+			setShowQRModal(false)
+		}
+	}
+
+	useEffect(() => {
+		const unsub = connector.onStatusChange(
+			(wallet: any) => {
+				if (wallet) {
+					setConnected(true)
+					setShowModal(false)
+					setShowWalletsModal(false)
+					setShowQRModal(false)
+					setPendingAddress(wallet.account.address)
+				} else {
+					setConnected(false)
+					setPendingAddress(undefined)
+					setBalance(null)
+				}
+			},
+			err => {
+				console.error('Ошибка подключения:', err)
+				alert(`Ошибка подключения: ${err.message}`)
+			}
+		)
+
+		connector.restoreConnection().catch(console.error)
+		return () => {
+			unsub()
+		}
+	}, [])
 
 	return (
 		<div className={styles.walletPage}>
@@ -64,10 +176,7 @@ export default function Wallet() {
 			<div className={styles.heroSection}>
 				{!connected ? (
 					<>
-						<button
-							className={styles.connectBtn}
-							onClick={() => setConnected(true)}
-						>
+						<button className={styles.connectBtn} onClick={handleConnectClick}>
 							<WalletIcon size={22} /> Connect Wallet
 						</button>
 						<p className={styles.connectHint}>
@@ -91,7 +200,7 @@ export default function Wallet() {
 								}}
 								title='Click to manage wallet'
 							>
-								{mockAddress}
+								{pendingAddress}
 								<ChevronDown size={18} color='#7a5cff' />
 							</span>
 						</div>
@@ -103,7 +212,13 @@ export default function Wallet() {
 								height={28}
 								className={styles.tonLogo}
 							/>
-							<span className={styles.balance}>{mockBalance} TON</span>
+							<span className={styles.balance}>
+								{balance !== null
+									? `${balance.toLocaleString('en-US', {
+											maximumFractionDigits: 4,
+									  })} TON`
+									: '...'}
+							</span>
 						</div>
 					</>
 				)}
@@ -168,6 +283,164 @@ export default function Wallet() {
 						<button
 							className={styles.cancelBtn}
 							onClick={() => setShowModal(false)}
+						>
+							Cancel
+						</button>
+					</div>
+				</div>
+			)}
+
+			{/* Modal for wallet selection */}
+			{showWalletsModal && (
+				<div
+					className={styles.modalOverlay}
+					onClick={() => setShowWalletsModal(false)}
+				>
+					<div className={styles.modalSheet} onClick={e => e.stopPropagation()}>
+						<div className={styles.modalHandle} />
+						<div className={styles.modalTitle}>Select wallet</div>
+						{loadingWallets ? (
+							<div style={{ textAlign: 'center', padding: '1.5rem 0' }}>
+								<Loader2 size={28} className={styles.txPendingSpin} />
+							</div>
+						) : wallets.length === 0 ? (
+							<div
+								style={{
+									textAlign: 'center',
+									color: '#7a5cff',
+									padding: '1.5rem 0',
+								}}
+							>
+								No wallets found
+							</div>
+						) : (
+							<div className={styles.walletsList}>
+								{wallets.map((w, i) => (
+									<button
+										key={w.name + w.address + i}
+										className={styles.walletItem}
+										onClick={() => handleWalletSelect(w)}
+									>
+										{w.icon && (
+											<img
+												src={w.icon}
+												alt={w.name}
+												className={styles.walletItemIcon}
+											/>
+										)}
+										<span className={styles.walletItemName}>{w.name}</span>
+										<span className={styles.walletItemAddr}>
+											{w.address?.slice(0, 6)}...{w.address?.slice(-4)}
+										</span>
+									</button>
+								))}
+							</div>
+						)}
+						<button
+							className={styles.cancelBtn}
+							onClick={() => setShowWalletsModal(false)}
+						>
+							Cancel
+						</button>
+					</div>
+				</div>
+			)}
+
+			{/* Modal for connect type selection */}
+			{showConnectTypeModal && (
+				<div
+					className={styles.modalOverlay}
+					onClick={() => setShowConnectTypeModal(false)}
+				>
+					<div className={styles.modalSheet} onClick={e => e.stopPropagation()}>
+						<div className={styles.modalHandle} />
+						<div className={styles.modalTitle}>How do you want to connect?</div>
+						<div
+							style={{
+								display: 'flex',
+								flexDirection: 'column',
+								gap: '1.1rem',
+								margin: '1.2rem 0',
+							}}
+						>
+							<button
+								className={styles.connectBtn}
+								style={{ justifyContent: 'center' }}
+								onClick={() => handleConnectType('qr')}
+							>
+								Scan QR code
+							</button>
+							<button
+								className={styles.connectBtn}
+								style={{
+									justifyContent: 'center',
+									background:
+										'linear-gradient(90deg, #a259ff 0%, #007aff 100%)',
+								}}
+								onClick={() => handleConnectType('link')}
+							>
+								Open in wallet app
+							</button>
+						</div>
+						<button
+							className={styles.cancelBtn}
+							onClick={() => setShowConnectTypeModal(false)}
+						>
+							Cancel
+						</button>
+					</div>
+				</div>
+			)}
+
+			{/* Modal for QR code */}
+			{showQRModal && (
+				<div
+					className={styles.modalOverlay}
+					onClick={() => setShowQRModal(false)}
+				>
+					<div className={styles.modalSheet} onClick={e => e.stopPropagation()}>
+						<div className={styles.modalHandle} />
+						<div className={styles.modalTitle}>Scan QR to connect</div>
+						{qrUrl ? (
+							<div
+								style={{
+									display: 'flex',
+									flexDirection: 'column',
+									alignItems: 'center',
+									gap: '1.1rem',
+									padding: '1.2rem 0',
+								}}
+							>
+								<img
+									src={qrUrl}
+									alt='TON Connect QR'
+									style={{
+										width: 180,
+										height: 180,
+										borderRadius: '1.1rem',
+										background: '#fff',
+										boxShadow: '0 2px 12px 0 #a259ff22',
+									}}
+								/>
+								<div
+									style={{
+										color: '#7a5cff',
+										fontWeight: 600,
+										fontSize: '1.07rem',
+										textAlign: 'center',
+									}}
+								>
+									Open your wallet app and scan the QR code
+								</div>
+							</div>
+						) : (
+							<div style={{ textAlign: 'center', padding: '2.5rem 0' }}>
+								<Loader2 size={28} className={styles.txPendingSpin} />
+							</div>
+						)}
+						<button
+							className={styles.cancelBtn}
+							onClick={() => setShowQRModal(false)}
 						>
 							Cancel
 						</button>
