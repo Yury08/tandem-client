@@ -10,6 +10,8 @@ import {
 	WalletInfoCurrentlyEmbedded,
 	WalletInfoCurrentlyInjected,
 } from '@tonconnect/sdk'
+import { useRef } from 'react'
+
 import {
 	ArrowDownLeft,
 	ArrowUpRight,
@@ -85,10 +87,12 @@ export default function Wallet() {
 	const [showConnectTypeModal, setShowConnectTypeModal] = useState(false)
 	const [connectionLink, setConnectionLink] = useState<string | null>(null)
 
+	const walletCreated = useRef(false)
+
 	const telegramId =
 		typeof window !== 'undefined'
 			? window?.Telegram?.WebApp?.initDataUnsafe?.user?.id
-			: undefined
+			: null
 
 	const {
 		balance,
@@ -105,6 +109,13 @@ export default function Wallet() {
 		if (!address) return ''
 		return address.slice(0, 6) + '...' + address.slice(-4)
 	}
+
+	useEffect(() => {
+		if (connected && pendingAddress && telegramId && !walletCreated.current) {
+			createWallet({ telegramId, walletAddress: pendingAddress })
+			walletCreated.current = true
+		}
+	}, [connected, pendingAddress])
 
 	const handleDisconnect = async () => {
 		await connector.disconnect()
@@ -168,14 +179,13 @@ export default function Wallet() {
 		const unsub = connector.onStatusChange(
 			(wallet: any) => {
 				if (wallet) {
-					const address = wallet.account.address
+					const address = String(wallet.account.address)
 					setConnected(true)
 					setShowModal(false)
 					setShowWalletsModal(false)
 					setShowQRModal(false)
 					setPendingAddress(address)
 					setChain(wallet.account.chain)
-					createWallet(telegramId, address)
 					// вызов мутации
 				} else {
 					setConnected(false)
