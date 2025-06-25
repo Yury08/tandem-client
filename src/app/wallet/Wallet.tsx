@@ -1,6 +1,9 @@
 'use client'
 import TonConnect from '@tonconnect/sdk'
 
+import { userService } from '@/services/user.service'
+import { ICreateWalletData } from '@/types/user.type'
+import { useMutation } from '@tanstack/react-query'
 import {
 	isWalletInfoCurrentlyEmbedded,
 	isWalletInfoCurrentlyInjected,
@@ -21,10 +24,9 @@ import Image from 'next/image'
 import QRCode from 'qrcode'
 import { useEffect, useState } from 'react'
 import ton_logo from '../../../public/ton-logo.png'
-import { TonConnectLocalStorage } from '../../services/wallet.service'
+import { useTonBalance } from '../../hooks/ton/useTonBalance'
+import { TonConnectLocalStorage } from '../../services/wallet_sdk.service'
 import styles from './Wallet.module.css'
-const mockAddress = 'EQB3...abc'
-const mockBalance = 123.456
 
 const mockTxs = [
 	{
@@ -79,16 +81,37 @@ export default function Wallet() {
 	const [showQRModal, setShowQRModal] = useState(false)
 	const [qrUrl, setQrUrl] = useState<string | null>(null)
 	const [pendingAddress, setPendingAddress] = useState<string | undefined>()
+	const [chain, setChain] = useState<string | undefined>()
 	const [showConnectTypeModal, setShowConnectTypeModal] = useState(false)
 	const [connectionLink, setConnectionLink] = useState<string | null>(null)
-	const [balance, setBalance] = useState<number | null>(null)
+
+	const telegramId =
+		typeof window !== 'undefined'
+			? window?.Telegram?.WebApp?.initDataUnsafe?.user?.id
+			: undefined
+
+	const {
+		balance,
+		loading: balanceLoading,
+		error: balanceError,
+	} = useTonBalance(pendingAddress, chain)
+
+	const { mutate: createWallet } = useMutation({
+		mutationKey: ['createWallet'],
+		mutationFn: (data: ICreateWalletData) => userService.createWallet(data),
+	})
+
+	const formatAddress = (address?: string) => {
+		if (!address) return ''
+		return address.slice(0, 6) + '...' + address.slice(-4)
+	}
 
 	const handleDisconnect = async () => {
 		await connector.disconnect()
 		setConnected(false)
 		setShowModal(false)
 		setPendingAddress(undefined)
-		setBalance(null)
+		setChain(undefined)
 	}
 
 	const handleConnectClick = async () => {
@@ -145,15 +168,19 @@ export default function Wallet() {
 		const unsub = connector.onStatusChange(
 			(wallet: any) => {
 				if (wallet) {
+					const address = wallet.account.address
 					setConnected(true)
 					setShowModal(false)
 					setShowWalletsModal(false)
 					setShowQRModal(false)
-					setPendingAddress(wallet.account.address)
+					setPendingAddress(address)
+					setChain(wallet.account.chain)
+					createWallet(telegramId, address)
+					// вызов мутации
 				} else {
 					setConnected(false)
 					setPendingAddress(undefined)
-					setBalance(null)
+					setChain(undefined)
 				}
 			},
 			err => {
@@ -200,7 +227,7 @@ export default function Wallet() {
 								}}
 								title='Click to manage wallet'
 							>
-								{pendingAddress}
+								{formatAddress(pendingAddress)}
 								<ChevronDown size={18} color='#7a5cff' />
 							</span>
 						</div>
@@ -213,10 +240,14 @@ export default function Wallet() {
 								className={styles.tonLogo}
 							/>
 							<span className={styles.balance}>
-								{balance !== null
+								{balanceLoading
+									? '...'
+									: balance !== null
 									? `${balance.toLocaleString('en-US', {
 											maximumFractionDigits: 4,
 									  })} TON`
+									: balanceError
+									? 'Ошибка'
 									: '...'}
 							</span>
 						</div>
