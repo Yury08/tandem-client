@@ -1,7 +1,7 @@
 import axios, { type CreateAxiosDefaults } from 'axios'
 
 const options: CreateAxiosDefaults = {
-	baseURL: 'http://localhost:5555',
+	baseURL: 'https://tandem-server-production.up.railway.app',
 	withCredentials: true,
 }
 
