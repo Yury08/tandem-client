@@ -89,7 +89,7 @@ export default function Wallet() {
 	const telegramId =
 		typeof window !== 'undefined'
 			? window?.Telegram?.WebApp?.initDataUnsafe?.user?.id
-			: 1468774138
+			: null
 
 	const {
 		balance,
@@ -109,6 +109,9 @@ export default function Wallet() {
 
 	const handleDisconnect = async () => {
 		await connector.disconnect()
+		if (pendingAddress) {
+			localStorage.removeItem(`wallet_saved_${pendingAddress}`)
+		}
 		setConnected(false)
 		setShowModal(false)
 		setPendingAddress(undefined)
