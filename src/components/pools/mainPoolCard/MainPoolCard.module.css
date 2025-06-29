@@ -1,0 +1,127 @@
+.card {
+	background: linear-gradient(90deg, #f3f6ff 0%, #f8f0ff 100%);
+	border-radius: 24px;
+	box-shadow: 0 4px 24px rgba(162, 89, 255, 0.1);
+	padding: 32px 24px 24px 24px;
+	margin-bottom: 28px;
+	animation: fadeSlideIn 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+	max-width: 600px;
+	margin-left: auto;
+	margin-right: auto;
+	border: 2px solid transparent;
+	background-clip: padding-box;
+	position: relative;
+	z-index: 1;
+}
+.card::before {
+	content: '';
+	position: absolute;
+	inset: 0;
+	border-radius: 24px;
+	padding: 2px;
+	background: linear-gradient(90deg, #007aff 0%, #a259ff 100%);
+	z-index: -1;
+	opacity: 0.18;
+}
+@keyframes fadeSlideIn {
+	from {
+		opacity: 0;
+		transform: translateY(40px);
+	}
+	to {
+		opacity: 1;
+		transform: translateY(0);
+	}
+}
+.headerRow {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	margin-bottom: 8px;
+}
+.header {
+	font-size: 1.35rem;
+	font-weight: 700;
+	color: #7a5cff;
+	letter-spacing: 0.01em;
+}
+.infoRow {
+	display: flex;
+	justify-content: space-between;
+	margin-bottom: 12px;
+}
+.label {
+	color: #8a8a8a;
+	font-size: 1.08rem;
+}
+.value {
+	color: #1a1a1a;
+	font-weight: 600;
+}
+.joinBtn {
+	margin-top: 22px;
+	width: 100%;
+	padding: 16px 0;
+	background: linear-gradient(90deg, #007aff 0%, #a259ff 100%);
+	color: #fff;
+	border: none;
+	border-radius: 14px;
+	font-size: 1.18rem;
+	font-weight: 700;
+	cursor: pointer;
+	transition: background 0.18s, transform 0.18s, box-shadow 0.18s;
+	box-shadow: 0 2px 12px rgba(162, 89, 255, 0.1);
+}
+.joinBtn:hover,
+.joinBtn:focus {
+	background: linear-gradient(90deg, #0051a8 0%, #7a3cff 100%);
+	transform: translateY(-2px) scale(1.02);
+	box-shadow: 0 6px 24px rgba(162, 89, 255, 0.18);
+}
+.howBtn {
+	display: flex;
+	align-items: center;
+	gap: 0.3em;
+	background: linear-gradient(90deg, #f3f6ff 0%, #f8f0ff 100%);
+	color: #7a5cff;
+	border: none;
+	border-radius: 8px;
+	font-size: 0.97rem;
+	font-weight: 600;
+	padding: 6px 14px;
+	cursor: pointer;
+	box-shadow: 0 1px 6px 0 #a259ff11;
+	transition: background 0.18s, color 0.18s, box-shadow 0.18s;
+}
+.howBtn:hover {
+	background: linear-gradient(90deg, #e0e7ff 0%, #f8f0ff 100%);
+	color: #23234a;
+	box-shadow: 0 2px 12px 0 #a259ff22;
+}
+.address {
+	font-size: 0.99rem;
+	color: #5a5a7a;
+	margin-bottom: 10px;
+	word-break: break-all;
+}
+.address span {
+	font-family: monospace;
+	color: #7a5cff;
+	background: #f3f6ff;
+	padding: 2px 8px;
+	border-radius: 7px;
+	font-size: 0.97rem;
+}
+@media (max-width: 600px) {
+	.card {
+		padding: 18px 6px 14px 6px;
+		max-width: 100%;
+	}
+	.header {
+		font-size: 1.12rem;
+	}
+	.joinBtn {
+		font-size: 1.01rem;
+		padding: 12px 0;
+	}
+}

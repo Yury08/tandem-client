@@ -1,0 +1,33 @@
+.tabs {
+	display: flex;
+	justify-content: center;
+	gap: 8px;
+	margin-bottom: 18px;
+}
+.tabs button {
+	background: none;
+	border: none;
+	outline: none;
+	font-size: 1.08rem;
+	font-weight: 500;
+	color: #888;
+	padding: 8px 18px;
+	border-radius: 10px 10px 0 0;
+	cursor: pointer;
+	transition: color 0.2s, background 0.2s;
+}
+.tabs button:hover {
+	background: #f5f6fa;
+	color: #007aff;
+}
+.active {
+	color: #222 !important;
+	background: #f5f6fa;
+	box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.03);
+}
+@media (max-width: 600px) {
+	.tabs button {
+		font-size: 0.97rem;
+		padding: 7px 10px;
+	}
+}

@@ -1,0 +1,86 @@
+.animatedBg {
+	position: absolute;
+	inset: 0;
+	z-index: 0;
+	pointer-events: none;
+	background: linear-gradient(120deg, #007aff 0%, #6f7cff 60%, #a259ff 100%);
+	opacity: 0.13;
+	animation: heroGradient 8s ease-in-out infinite alternate;
+}
+@keyframes heroGradient {
+	0% {
+		filter: blur(0.5rem) brightness(1);
+	}
+	100% {
+		filter: blur(1.5rem) brightness(1.1);
+	}
+}
+
+.wrapper {
+	max-width: 900px;
+	margin: 0 auto;
+	padding: 32px 16px 120px 16px;
+	background: #fff;
+	min-height: 140vh;
+	border-radius: 24px;
+	box-shadow: 0 4px 32px rgba(0, 0, 0, 0.06);
+	position: relative;
+	z-index: 1;
+	overflow: hidden;
+}
+
+.createBtn {
+	position: static;
+	display: block;
+	margin: 48px auto 32px auto;
+	max-width: 420px;
+	width: 100%;
+	background: linear-gradient(90deg, #007aff 0%, #a259ff 100%);
+	color: #fff;
+	font-size: 1.18rem;
+	font-weight: 600;
+	border: none;
+	border-radius: 16px;
+	box-shadow: 0 4px 16px rgba(162, 89, 255, 0.1);
+	padding: 18px 0;
+	cursor: pointer;
+	z-index: 1;
+	transition: transform 0.18s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.18s,
+		background 0.18s;
+	animation: fadeInBtn 0.7s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.createBtn:hover,
+.createBtn:focus {
+	transform: translateY(-2px) scale(1.02);
+	box-shadow: 0 8px 32px rgba(162, 89, 255, 0.18);
+	background: linear-gradient(90deg, #0051a8 0%, #7a3cff 100%);
+}
+@keyframes fadeInBtn {
+	from {
+		opacity: 0;
+		transform: translateY(30px);
+	}
+	to {
+		opacity: 1;
+		transform: translateY(0);
+	}
+}
+
+@media (max-width: 600px) {
+	.wrapper {
+		padding: 16px 2vw 90px 2vw;
+		border-radius: 0;
+		box-shadow: none;
+		min-height: 120vh;
+	}
+	.createBtn {
+		margin: 32px auto 18px auto;
+		padding: 12px 0;
+		font-size: 1.01rem;
+		border-radius: 12px;
+	}
+}
+
+.poolGrid {
+	/* Можно добавить кастомные стили для сетки, если потребуется */
+}
